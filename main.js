@@ -135,7 +135,18 @@ function searchTask() {
   }
 }
 
+function handleClick(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    userTask = `<input type='text' class='item' value="${
+      userInput.value
+    }" data-id=${++count}>`;
+    displayTask();
+  }
+}
+
 submit.addEventListener("click", displayTask);
+userInput.addEventListener("keyup", handleClick);
 search.addEventListener("click", searchTask);
 
 restoreFromLocalStorage();
