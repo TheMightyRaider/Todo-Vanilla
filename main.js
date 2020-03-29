@@ -6,7 +6,7 @@ let count = 0;
 
 function displayTask() {
   if (userTask) {
-    const html = `<div class='task'> ${userTask}  <input type='checkbox' data-id=${count++}> <button class='remove' data-id=${count++}>Remove</button><br><br> </div>`;
+    const html = `<div class='task'> ${userTask}  <input type='checkbox' data-id=${count++}> <button class='remove' >Remove</button><br><br> </div>`;
     todoList.innerHTML += html;
     document
       .querySelectorAll(".remove")
@@ -14,20 +14,23 @@ function displayTask() {
     document
       .querySelectorAll('input[type="checkbox"]')
       .forEach(item => item.addEventListener("change", checkToggle));
+    document.querySelectorAll(".item").forEach(item => {
+      item.addEventListener("change", () => {
+        item.defaultValue = item.value;
+      });
+    });
   }
 }
 
 function removeTodo(event) {
-  console.log(event.target.parentElement.remove());
+  event.target.parentElement.remove();
 }
 
 function checkToggle(event) {
-  console.log(event);
   console.log(event.target.checked);
 }
 
 userInput.addEventListener("blur", () => {
-  console.log(userInput.value);
-  userTask = userInput.value;
+  userTask = `<input type='text' class='item' value="${userInput.value}">`;
 });
 submit.addEventListener("click", displayTask);
