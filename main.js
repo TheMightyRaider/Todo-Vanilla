@@ -2,6 +2,7 @@ const userInput = document.querySelector("input[name='todo']");
 const todoList = document.querySelector(".todo-list");
 const submit = document.querySelector(".submit");
 const search = document.querySelector(".search");
+const searchItem = document.querySelector("input[name='search']");
 let userTask;
 let count = 0;
 let previouscount;
@@ -10,7 +11,6 @@ let detailsToBeUploaded = [];
 
 function displayTask() {
   if (userTask && previouscount != count) {
-    console.log(count);
     previouscount = count;
     const html = `<div class='task'> ${userTask}  <input type='checkbox' data-id=${count}> <button class='remove' data-id='${count}'>Remove</button><br><br> </div>`;
     todoList.innerHTML += html;
@@ -21,7 +21,6 @@ function displayTask() {
     };
     userInput.value = "";
     detailsToBeUploaded.push(taskDetails);
-    console.log(detailsToBeUploaded);
     addListener();
     onTaskChange();
     storeInLocalStorage(detailsToBeUploaded);
@@ -84,9 +83,7 @@ function restoreFromLocalStorage() {
     detailsToBeUploaded.sort((a, b) => {
       return a.checked - b.checked;
     });
-    console.log(detailsToBeUploaded);
     displayOnReload(detailsToBeUploaded);
-    console.log(count);
   }
 }
 
@@ -100,7 +97,6 @@ function removeTodo(event) {
 }
 
 function checkToggle(event) {
-  console.log(event.target);
   event.target.checked
     ? (event.target.defaultChecked = true)
     : (event.target.defaultChecked = false);
@@ -125,13 +121,39 @@ function searchTask() {
   );
   if (searchedItem.length > 0) {
     todoList.style.display = "none";
-    console.log(generateHtml(searchedItem));
     document.querySelector(".taskSearched").innerHTML = generateHtml(
       searchedItem
     );
   } else {
     todoList.style.display = "block";
     document.querySelector(".taskSearched").innerHTML = "";
+  }
+}
+
+function dynamicSearch(event) {
+  if ((event.which <= 90 && event.which >= 48) || event.which == 8) {
+    const displayResult = document.querySelector(".taskSearched");
+    const taskToBeSearched = document
+      .querySelector('input[name="search"]')
+      .value.toUpperCase();
+    if (taskToBeSearched != "") {
+      const matchingItem = detailsToBeUploaded
+        .map(item => {
+          if (item.task.toUpperCase().indexOf(taskToBeSearched) > -1) {
+            return item;
+          }
+        })
+        .filter(item => item != undefined);
+      if (matchingItem.length > 0) {
+        todoList.style.display = "none";
+        displayResult.innerHTML = generateHtml(matchingItem);
+        addListener();
+        onTaskChange();
+      }
+    } else {
+      todoList.style.display = "block";
+      displayResult.innerHTML = "Your task doesn't exist";
+    }
   }
 }
 
@@ -147,6 +169,6 @@ function handleClick(event) {
 
 submit.addEventListener("click", displayTask);
 userInput.addEventListener("keyup", handleClick);
-search.addEventListener("click", searchTask);
+searchItem.addEventListener("keyup", dynamicSearch);
 
 restoreFromLocalStorage();
