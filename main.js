@@ -1,9 +1,11 @@
 const userInput = document.querySelector("input[name='todo']");
 const todoList = document.querySelector(".todo-list");
 const submit = document.querySelector(".submit");
+const search = document.querySelector(".search");
 let userTask;
 let count = 0;
 let previouscount;
+let htmlToBeAppended;
 let detailsToBeUploaded = [];
 
 function displayTask() {
@@ -48,7 +50,14 @@ function onTaskChange() {
 }
 
 function displayOnReload() {
-  detailsToBeUploaded.forEach(item => {
+  todoList.innerHTML += generateHtml(detailsToBeUploaded);
+  addListener();
+  onTaskChange();
+}
+
+function generateHtml(taskArray) {
+  htmlToBeAppended = "";
+  taskArray.forEach(item => {
     let html = `<div class='task'> <input type='text' class='item' value='${
       item.task
     }' data-id=${item.id}>  <input type='checkbox' data-id=${item.id} ${
@@ -56,10 +65,9 @@ function displayOnReload() {
     }> <button class='remove' data-id='${
       item.id
     }'>Remove</button><br><br> </div>`;
-    todoList.innerHTML += html;
-    addListener();
+    htmlToBeAppended += html;
   });
-  onTaskChange();
+  return htmlToBeAppended;
 }
 
 function storeInLocalStorage(items) {
@@ -109,6 +117,25 @@ userInput.addEventListener("blur", () => {
     userInput.value
   }" data-id=${++count}>`;
 });
+
+function searchTask() {
+  const taskToBeSearched = document.querySelector('input[name="search"]').value;
+  const searchedItem = detailsToBeUploaded.filter(
+    obj => obj.task.toUpperCase() == taskToBeSearched.toUpperCase()
+  );
+  if (searchedItem.length > 0) {
+    todoList.style.display = "none";
+    console.log(generateHtml(searchedItem));
+    document.querySelector(".taskSearched").innerHTML = generateHtml(
+      searchedItem
+    );
+  } else {
+    todoList.style.display = "block";
+    document.querySelector(".taskSearched").innerHTML = "";
+  }
+}
+
 submit.addEventListener("click", displayTask);
+search.addEventListener("click", searchTask);
 
 restoreFromLocalStorage();
